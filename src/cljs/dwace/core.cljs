@@ -5,18 +5,52 @@
             [goog.events :as events]
             [goog.history.EventType :as HistoryEventType]
             [markdown.core :refer [md->html]]
+            [dwace.data :as d]
             [dwace.websockets :as ws])
   (:require-macros [reagent.ratom :refer [reaction]])
   (:import goog.History))
 
 
+
+(defn todo-item-elem [todo-item-atom]
+  (let [in-focus (r/atom false)]
+    (fn []
+      [:div
+       [:label "Todo item:"]
+       [:input {:id "todo-add-item"
+                :class "add-item"
+                :required ""
+                :value @todo-item-atom
+                :on-change #(reset! todo-item-atom (-> % .-target .-value))
+                :on-focus #(swap! in-focus not)
+                :on-blur #(swap! in-focus not)}]])))
+
 (defn add-todo []
-  [:div
-   [:h3 "Add ToDo"]])
+  (let [todo-item (r/atom "")]
+    (fn []
+      [:div
+       [:h3 "Add Todo"]
+       [todo-item-elem todo-item]
+       [:button {:id "todo-add"
+                 :disabled (empty? @todo-item)
+                 :on-click #(do (d/insert-todo @todo-item)
+                                (reset! todo-item ""))}
+        "Add"]])))
+
+(defn todo-item [todo]
+  ^{:key (:db/id todo)} [:li
+                         [:div
+                          [:label (:todo/item todo)]]])
 
 (defn todo-list []
-  [:div
-   [:h3 "ToDo List"]])
+  (fn []
+    [:div
+     [:h3 "ToDo List"]
+     (if (empty? (d/pull-todos))
+       [:p {:style {:color "gray"}} "List is empty"]
+       (into [:ul]
+             (for [todo (d/pull-todos)]
+               (todo-item todo))))]))
 
 (defn navbar []
   [:div
