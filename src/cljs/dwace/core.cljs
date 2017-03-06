@@ -10,6 +10,14 @@
   (:import goog.History))
 
 
+(defn add-todo []
+  [:div
+   [:h3 "Add ToDo"]])
+
+(defn todo-list []
+  [:div
+   [:h3 "ToDo List"]])
+
 (defn navbar []
   [:div
    [:a {:href "#/"} "Home"]
@@ -18,15 +26,18 @@
 
 (defn about-page []
   [:div.container
-   [:p "This is the story of dwace... work in progress"]])
+   [:h1 "About"]
+   [:hr]
+   [:p "This is a simple todo list manager written as a coding exercise."]
+   [:p "Currently data is stored on the server only while the server is running."]])
 
-(defn home-page
-  "gol DOM layout"
-  []
+(defn home-page []
   (fn []
     [:div
-     [:h1 "Shouting"]
-     [:hr]]))
+     [:h1 "Simple ToDo List Manager"]
+     [:hr]
+     [todo-list]
+     [add-todo]]))
 
 (def pages
   {:home #'home-page
