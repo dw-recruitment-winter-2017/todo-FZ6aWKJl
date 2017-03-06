@@ -41,3 +41,14 @@
 (defn pull-todos []
   (for [d (get-todo-ids)]
     (pull-todo (first d))))
+
+(defn todo-status-change
+  [id]
+  (let [t @(p/pull conn '[*] id)]
+    (p/transact! conn [[:db/add id :todo/completed (not (:todo/completed t))]])))
+
+
+(defn delete-todo
+  [id]
+  (let [t @(p/pull conn '[*] id)]
+    (p/transact! conn [[:db.fn/retractEntity id]])))

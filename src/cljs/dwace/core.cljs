@@ -40,6 +40,14 @@
 (defn todo-item [todo]
   ^{:key (:db/id todo)} [:li
                          [:div
+                          "COMPLETE "
+                          [:input {:type "checkbox"
+                                   :checked (:todo/completed todo)
+                                   :on-change #(d/todo-status-change (:db/id todo))}]
+                          " || DELETE "
+                          [:input {:type "checkbox"
+                                   :on-change #(d/delete-todo (:db/id todo))}]
+                          " || "
                           [:label (:todo/item todo)]]])
 
 (defn todo-list []
