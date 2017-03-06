@@ -3,7 +3,8 @@
             [cognitect.transit :as t]
             [compojure.core :refer [GET defroutes]]
             [org.httpkit.server :refer [send! with-channel on-close on-receive]]
-            [clojure.tools.logging :as log])
+            [clojure.tools.logging :as log]
+            [dwace.db.core :as d])
   (:import [java.io ByteArrayInputStream ByteArrayOutputStream]))
 
 
@@ -25,7 +26,6 @@
         new-json (assoc old-json :message (str/upper-case (:message old-json)))]
     (encode-transit new-json)))
 
-
 (defn connect! [channel]
   (log/info "channel open")
   (swap! channels conj channel))
@@ -34,15 +34,11 @@
   (log/info "channel closed:" status)
   (swap! channels #(remove #{channel} %)))
 
-(defn notify-clients [msg]
-  (doseq [channel @channels]
-    (send! channel (shout-message msg))))
-
 (defn ws-handler [request]
   (with-channel request channel
     (connect! channel)
     (on-close channel (partial disconnect! channel))
-    (on-receive channel #(notify-clients %))))
+    (on-receive channel #(d/update-database (decode-transit %)))))
 
 (defroutes websocket-routes
   (GET "/ws" request (ws-handler request)))

@@ -117,5 +117,5 @@
 
 (defn init! []
   (hook-browser-navigation!)
-  ;(ws/make-websocket! (str "ws://" (.-host js/location) "/ws") update-messages!)
+  (ws/make-websocket! (str "ws://" (.-host js/location) "/ws") d/update-todo-list!)
   (mount-components))

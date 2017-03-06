@@ -1,7 +1,8 @@
 (ns dwace.data
   (:require [reagent.core :as r]
             [datascript.core :as d]
-            [posh.reagent :as p]))
+            [posh.reagent :as p]
+            [dwace.websockets :as ws]))
 
 
 (defonce conn (d/create-conn))
@@ -11,16 +12,16 @@
 (defonce counter (r/atom 0))
 
 
-(defn insert-todo
-  ""
-  [item]
+(defn insert-todo [item]
   (let [key (swap! counter inc)
         todo [{:todo/key key
                :todo/item item
                :todo/completed false}]]
-    (p/transact! conn todo)))
+    (p/transact! conn todo)
+    (ws/send-transit-msg! {:insert-todo todo})))
 
 
+;; stub function for future handling of updates from server
 (defn update-todo-list! [])
 
 
@@ -45,10 +46,12 @@
 (defn todo-status-change
   [id]
   (let [t @(p/pull conn '[*] id)]
-    (p/transact! conn [[:db/add id :todo/completed (not (:todo/completed t))]])))
+    (p/transact! conn [[:db/add id :todo/completed (not (:todo/completed t))]])
+    (ws/send-transit-msg! {:update-todo @(p/pull conn '[*] id)})))
 
 
 (defn delete-todo
   [id]
   (let [t @(p/pull conn '[*] id)]
-    (p/transact! conn [[:db.fn/retractEntity id]])))
+    (p/transact! conn [[:db.fn/retractEntity id]])
+    (ws/send-transit-msg! {:remove-todo t})))

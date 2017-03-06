@@ -3,6 +3,7 @@
             [dwace.repl :as repl]
             [dwace.config :refer [env]]
             [dwace.logger :as logger]
+            [dwace.db.core :as d]
             [org.httpkit.server :as http]
             [clojure.tools.cli :refer [parse-opts]]
             [clojure.tools.logging :as log]
@@ -61,6 +62,7 @@
                         mount/start-with-args
                         :started)]
     (log/info component "started"))
+  (d/load-schema)
   (.addShutdownHook (Runtime/getRuntime) (Thread. stop-app)))
 
 (defn -main [& args]
