@@ -1,0 +1,27 @@
+<!html>
+<DOCTYPE>
+  <head>
+    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
+    <title>dwace</title>
+  </head>
+  <body>
+    <div id="navbar"></div>
+    <div id="app">
+      <p>ClojureScript not compiled.  Run fighweel to compile.</p>
+    </div>
+
+    <!-- scripts and styles -->
+    {% style "/css/screen.css" %}
+    
+    <script type="text/javascript">
+        var context = "{{servlet-context}}";
+        var csrfToken = "{{csrf-token}}";
+    </script>
+    {% script "/js/app.js" %}
+  </body>
+</html>
+
+
+
+
